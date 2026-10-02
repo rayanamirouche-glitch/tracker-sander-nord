@@ -1,0 +1,977 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tracker Sander Nord — R.Consulting</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--ink:#242137;--muted:#737183;--line:#e8e6ef;--bg:#f7f7fb;--card:#fff;--primary:#763ce0;--primary-soft:#eee8fa;--primary-deep:#5b21b6;--side:#211831;--side-fg:#d0c7df;--side-line:#3b3053;--ok:#059669;--ok-soft:#e8f5e9;--warn:#c2410c;--warn-soft:#fff4e5;--bad:#bd304e;--bad-soft:#fdecef;--terra:#763ce0;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+button{font-family:inherit}
+.mono{font-family:'DM Mono',monospace}
+/* ── coquille : barre latérale + contenu ── */
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-fg);padding:22px 16px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;color:#fff;padding:2px 6px}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:#fff;color:var(--side);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem}
+.brand-mark span{color:var(--primary)}
+.brand b{display:block;font-size:.86rem;letter-spacing:.6px}.brand small{display:block;font-size:.62rem;letter-spacing:1.4px;color:#9d92b8;margin-top:2px}
+.side-label{font-size:.6rem;letter-spacing:1.6px;color:#8b80a6;padding:0 8px;font-weight:700}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav a,.nav button{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--side-fg);text-decoration:none;font-weight:600;font-size:.86rem;border:0;background:none;cursor:pointer;text-align:left;width:100%}
+.nav a:hover,.nav button:hover{background:#2c2142;color:#fff}
+.nav a.on{background:#322649;color:#fff}
+.nav svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav .nb{margin-left:auto;background:var(--primary);color:#fff;border-radius:10px;padding:1px 8px;font-size:.66rem;font-weight:800}
+.nav.mobile{display:none}
+.side-card{margin-top:auto;background:#2a1f40;border:1px solid var(--side-line);border-radius:14px;padding:14px;display:flex;gap:10px;align-items:flex-start;font-size:.8rem;color:#fff}
+.side-card small{display:block;color:#a99dc4;font-size:.7rem;margin-top:2px}
+.side-card svg{width:20px;height:20px;stroke:#a78bfa;fill:none;stroke-width:2;flex:none}
+.main{min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 28px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:10}
+.crumb{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:6px}.crumb b{color:var(--ink);font-weight:700}
+.top-right{display:flex;align-items:center;gap:10px}
+.pill{font-size:.72rem;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:5px 11px;white-space:nowrap}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--primary-soft);color:var(--primary-deep);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem}
+.work{padding:26px 28px 60px;max-width:1240px}
+.heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.eyebrow{font-size:.62rem;letter-spacing:1.6px;font-weight:800;color:var(--primary);margin-bottom:6px}
+.heading h1{font-size:1.65rem;font-weight:800;letter-spacing:-.4px;line-height:1.15}
+.heading p{color:var(--muted);font-size:.9rem;margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font-size:.8rem;font-weight:700;border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;transition:all .15s;background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{background:#f3f1f7}
+.btn-avis{background:var(--primary);border-color:var(--primary);color:#fff}.btn-avis:hover{background:var(--primary-deep)}
+.btn-rank{background:#fff}
+.btn-sel{background:var(--warn-soft);border-color:#fcd9bd;color:var(--warn)}.btn-sel:hover{background:#ffe8d6}
+.btn-add{background:var(--ok);border-color:var(--ok);color:#fff}.btn-add:hover{background:#047857}
+.btn:disabled{opacity:.5;cursor:wait}
+.search{font-size:.85rem;border:1px solid var(--line);border-radius:10px;padding:9px 12px 9px 36px;width:280px;max-width:100%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23737183' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") 11px center no-repeat;color:var(--ink)}
+.search:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.msg{font-size:.8rem;color:var(--muted);min-height:22px;margin:-6px 0 12px}
+.msg:not(:empty){background:#fff;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:9px 12px;color:var(--ink)}
+/* ── tuiles ── */
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.stat-lbl{font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-ico{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--primary-soft);color:var(--primary-deep);flex:none}
+.stat-ico.green{background:var(--ok-soft);color:var(--ok)}.stat-ico.orange{background:var(--warn-soft);color:var(--warn)}
+.stat-ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.stat-val{font-weight:800;font-size:1.55rem;line-height:1.05;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.stat-val small{font-size:.8rem;font-weight:700;color:var(--ok);margin-left:6px}
+.objbar{height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden}
+.objfill{height:100%;background:var(--primary);border-radius:3px;transition:width .3s}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:16px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.panel-head h2{font-size:1rem;font-weight:800}
+.panel-head span.n{font-size:.78rem;color:var(--muted);margin-left:8px;font-weight:600}
+.chartbox{padding:14px 18px 10px}
+.cmds{padding:16px 20px}
+.cmds h4{font-size:.62rem;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:8px;font-weight:800}
+.cmds .c{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:.88rem}
+.cmds .c:first-of-type{border-top:0}
+.cmds .c small{display:block;font-size:.72rem;color:var(--muted);margin-top:2px}
+.cmds .st{font-size:.66rem;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+.cmds .st.ok{background:var(--ok-soft);color:var(--ok)}.cmds .st.run{background:var(--primary-soft);color:var(--primary-deep)}
+/* ── filtres ── */
+.tools{padding:12px 20px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line);background:#fbfbfd}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:.76rem;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:6px 12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:#c9c4d6;color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip b{font-weight:800;margin-left:5px;opacity:.85}
+.chip.ok.on{background:var(--ok);border-color:var(--ok)}.chip.bad.on{background:var(--bad);border-color:var(--bad)}.chip.warn.on{background:var(--warn);border-color:var(--warn)}.chip.met.on{background:var(--primary);border-color:var(--primary);color:#fff}
+/* ── tableau ── */
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+thead th{font-size:.64rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);background:#fff;font-weight:800;white-space:nowrap}
+thead th.s{cursor:pointer;user-select:none}thead th.s:hover{color:var(--ink)}
+thead th.s::after{content:'';margin-left:4px}thead th.s.asc::after{content:'↑'}thead th.s.desc::after{content:'↓'}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#faf9fd}
+tr.alert{background:var(--bad-soft)}tr.alert:hover{background:#fbe0e6}
+.biz{display:flex;align-items:flex-start;gap:10px;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--ink);font:inherit}
+.biz-ico{width:32px;height:32px;border-radius:9px;background:var(--primary-soft);color:var(--primary-deep);display:flex;align-items:center;justify-content:center;flex:none;font-weight:800;font-size:.8rem}
+.fname{font-weight:700;color:var(--ink);text-decoration:none;display:block}.biz:hover .fname{color:var(--primary)}
+.fcity{font-size:.74rem;color:var(--muted)}
+.maps{font-size:.72rem;color:var(--primary);text-decoration:none;font-weight:600}.maps:hover{text-decoration:underline}
+.ajout{font-size:.7rem;color:var(--muted);margin-top:2px}
+.delta{font-family:'DM Mono',monospace;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:6px;display:inline-block}
+.delta.up{background:var(--ok-soft);color:var(--ok)}.delta.down{background:var(--bad-soft);color:var(--bad)}
+.pos{font-family:'DM Mono',monospace;font-weight:800;display:inline-block;min-width:34px;text-align:center;padding:3px 8px;border-radius:8px;background:#f0edf7;color:var(--ink)}
+.pos.top{background:var(--ok-soft);color:var(--ok)}.pos.mid{background:var(--warn-soft);color:var(--warn)}.pos.low,.pos.none{background:#f0edf7;color:var(--muted)}
+.poskw{font-size:.68rem;color:var(--muted);margin-top:4px;white-space:nowrap}.poskw b{color:var(--ink)}.poskw b.top{color:var(--ok)}
+.star{color:#b45309;font-weight:700;font-size:.85rem}
+.unlinked{font-size:.7rem;color:var(--bad);font-weight:700}
+.objcell{min-width:120px;cursor:pointer}.objcell:hover .objtxt{text-decoration:underline}
+.objtxt{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700}.objtxt.done{color:var(--ok)}
+.minibar{height:5px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}.minifill{height:100%;background:var(--primary);border-radius:3px}.minifill.part{background:var(--primary)}
+.edit{border:none;background:none;cursor:pointer;color:var(--muted);font-size:.8rem;padding:0 3px}.edit:hover{color:var(--primary)}
+.manuel{font-size:.62rem;color:var(--primary);margin-left:4px;font-weight:700}
+.rf{font-size:.72rem;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:6px;padding:1px 7px;margin-left:6px;cursor:pointer;vertical-align:middle}.rf:hover{color:var(--ink)}.rf:disabled{opacity:.5;cursor:wait}
+.cnt2{margin-top:4px;font-family:'DM Mono',monospace;font-size:.68rem;font-weight:700;white-space:nowrap}.postes{color:var(--ok)}.perdus{color:var(--muted);margin-left:6px}
+.cmdb{display:inline-block;margin-top:4px;font-size:.66rem;font-weight:700;border-radius:8px;padding:2px 8px}.cmdb.ok{background:var(--ok-soft);color:var(--ok)}.cmdb.warn{background:var(--warn-soft);color:var(--warn)}
+.kwin{font-family:'DM Mono',monospace;font-size:.72rem;border:1px solid transparent;background:transparent;color:var(--ink);padding:5px 7px;border-radius:7px;width:100%;min-width:190px}
+.kwin:hover{border-color:var(--line);background:#fff}.kwin:focus{border-color:var(--primary);outline:none;background:#fff}.kwin.over{color:var(--primary);font-weight:700}.kwin:disabled{opacity:.5}
+.kwcell{display:flex;align-items:center;gap:4px}.kwrst{border:none;background:none;cursor:pointer;color:var(--muted);font-size:.9rem;padding:2px}.kwrst:hover{color:var(--primary)}
+.selbox{width:15px;height:15px;cursor:pointer;accent-color:var(--primary)}
+.empty{padding:26px 14px;text-align:center;color:var(--muted);font-size:.85rem}
+.foot{font-size:.72rem;color:var(--muted);padding:18px 4px;display:flex;gap:8px;align-items:center}
+/* ── panneau de détail (fiche) ── */
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(36,33,55,.42);z-index:30}
+.sheet{display:none;position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:#fff;z-index:31;box-shadow:-20px 0 60px rgba(36,33,55,.18);overflow:auto;padding:24px 26px 40px}
+.sheet.open,.sheet-bg.open{display:block}
+.sheet .close{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:1.1rem;color:var(--muted)}
+.sheet h2{font-size:1.25rem;font-weight:800;letter-spacing:-.3px;margin:6px 0 4px;padding-right:44px}
+.sheet .sub{color:var(--muted);font-size:.86rem}
+.sheet .maps{display:inline-block;margin-top:8px}
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin:18px 0 14px}
+.tabs button{flex:1;border:0;background:none;padding:9px 6px;border-radius:9px;font-weight:600;font-size:.82rem;color:var(--muted);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06);font-weight:700}
+.tab{display:none}.tab.on{display:block}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv .k{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.kv label{display:block;font-size:.62rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:4px}
+.kv .v{font-size:1.15rem;font-weight:800;font-variant-numeric:tabular-nums}.kv .v small{font-size:.74rem;color:var(--muted);font-weight:600}
+.kv.wide{grid-template-columns:1fr}
+.hist{margin-top:10px}
+.hrow{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.hrow .dot{width:9px;height:9px;border-radius:50%;background:var(--primary);margin-top:6px;flex:none}
+.hrow small{display:block;color:var(--muted);font-size:.74rem}
+.sheet .field{display:block;margin:12px 0 4px;font-size:.66rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.sheet input.in{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:.92rem}
+.sheet input.in:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.sheet .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.sheet .note{font-size:.78rem;color:var(--muted);margin-top:8px}
+/* ── modales ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(36,33,55,.5);z-index:40;padding:16px;overflow:auto}
+.modal .box{background:#fff;border-radius:18px;max-width:480px;margin:40px auto;padding:22px;border:1px solid var(--line)}
+.modal h3{font-size:1.1rem;font-weight:800;margin-bottom:4px}.modal p{font-size:.8rem;color:var(--muted);margin-bottom:12px}
+.modal label{display:block;font-size:.64rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:12px 0 5px;font-weight:800}
+.modal input,.modal select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:.92rem;background:#fff}
+.modal input:focus,.modal select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.modal .row{display:flex;gap:8px;margin-top:16px}.modal .row .btn{flex:1;justify-content:center}
+.modal .c2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal .prix{margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.88rem;line-height:1.5}
+.modal .prix b{font-size:1.3rem}.modal .prix small{display:block;font-size:.72rem;color:var(--muted);margin-top:4px}
+.del{border:none;background:none;color:var(--bad);cursor:pointer;font-size:.8rem}
+/* ── téléphone ── */
+@media(max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;padding:14px 16px;flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}
+  .side .nav,.side .side-label,.side .side-card{display:none}
+  .side .nav.mobile{display:flex;flex-direction:row;gap:6px;margin-left:auto}.side .nav.mobile a,.side .nav.mobile button{padding:7px 10px;font-size:.76rem}
+  .topbar{padding:10px 14px;flex-wrap:wrap}.crumb{display:none}.top-right{width:100%}.search{width:100%}
+  .work{padding:14px 14px 60px}
+  .heading h1{font-size:1.3rem}
+  .actions .btn{padding:8px 10px;font-size:.74rem}
+  .stats{grid-template-columns:repeat(3,1fr);gap:8px}.stat{padding:12px}.stat-val{font-size:1.2rem}.stat-lbl{white-space:normal;font-size:.66rem;line-height:1.2}.stat-ico{width:24px;height:24px}
+  .chartbox{padding:10px}
+  .tablewrap{overflow:visible}
+  table,thead,tbody,tr,td{display:block}thead{display:none}
+  tbody tr{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 12px;padding:8px 12px 10px;position:relative}
+  tbody tr:hover{background:var(--card)}
+  tbody td{border:none;padding:6px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  tbody td::before{content:attr(data-label);font-size:.62rem;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);flex-shrink:0;padding-top:3px;min-width:74px;font-weight:700}
+  tbody td.c-sel{position:absolute;top:12px;right:12px;padding:0}tbody td.c-sel::before{display:none}
+  tbody td.c-num{display:none}
+  tbody td.c-nom{display:block;padding-right:36px;padding-top:6px}tbody td.c-nom::before{display:none}
+  tbody td.c-kw{display:block}tbody td.c-kw::before{display:block;margin-bottom:2px}
+  .kwin{min-width:0;padding:6px 8px;background:var(--bg);border-color:var(--line)}
+  tbody td.c-c3:empty{display:none}
+  .objcell{min-width:0;text-align:right}.minibar{width:110px;margin-left:auto}
+  .poskw{white-space:normal;text-align:right}
+  .kv{grid-template-columns:1fr 1fr}
+}
+</style></head><body>
+<div class="shell">
+<aside class="side">
+  <div class="brand"><div class="brand-mark">R<span>.</span></div><div><b>TRACKER</b><small>SUIVI LOCAL GOOGLE</small></div></div>
+  <div class="side-label">ESPACE DE SUIVI</div>
+  <nav class="nav">
+    <a href="#top" class="on" onclick="navOn(this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Vue d'ensemble</a>
+    <a href="#tableau" onclick="navOn(this)"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Toutes les fiches<span class="nb" id="navNb">—</span></a>
+    <a href="#cmds" onclick="navOn(this)"><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5L6 6z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>Vos commandes</a>
+    <button onclick="ouvrirCommande()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Commander des avis</button>
+  </nav>
+  <nav class="nav mobile"><button onclick="ouvrirCommande()">🛒 Commander</button></nav>
+  <div class="side-card"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg><div>Espace client<small>Relevés Google et classements à la demande</small></div></div>
+</aside>
+<div class="main" id="top">
+<header class="topbar">
+  <div class="crumb">Pilotage local <span>›</span> <b>Tracker</b></div>
+  <div class="top-right"><input class="search" id="q" placeholder="Rechercher une fiche, une ville, un mot-clé…" oninput="Q=this.value;applyView()"><span class="pill">Relevé manuel · <span id="hNb">—</span> fiches</span><span class="avatar">RC</span></div>
+</header>
+<main class="work">
+<div class="heading">
+  <div><div class="eyebrow">VOTRE PORTEFEUILLE GOOGLE</div><h1>Tracker Sander Nord</h1><p>Avis Google et position locale de chacune de vos fiches, mesurés comme les voit un client.</p></div>
+  <div class="actions">
+    <button class="btn btn-avis" id="btnAvis" onclick="runAvis()">↻ Actualiser les avis</button>
+    <button class="btn btn-rank" id="btnRank" onclick="runRank()">📍 Classements</button>
+    <button class="btn btn-sel" id="btnSel" onclick="runRankSel()" title="Coche des fiches dans le tableau, puis mesure leur classement (1 recherche par mot-clé et par fiche)">📍 Classement des cochées (0)</button>
+    <button class="btn btn-rank" id="btnC3" onclick="runC3()">🗓 3 jours</button>
+    <button class="btn btn-add" id="btnAdd" onclick="$('modal').style.display='block';$('a_n').focus()">+ Fiche</button>
+    <button class="btn btn-avis" id="btnCmd" onclick="ouvrirCommande()">🛒 Commander des avis</button>
+    <button class="btn btn-rank" id="btnRecale" onclick="recaleBase()" style="display:none;border-color:var(--bad);color:var(--bad)">⚖ Recaler la base</button>
+  </div>
+</div>
+<div class="msg" id="msg"></div>
+<div class="stats">
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Total avis</span><span class="stat-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4V5z"/></svg></span></div><div class="stat-val" id="stTotal">—</div></div>
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Variation</span><span class="stat-ico green"><svg viewBox="0 0 24 24"><path d="M4 17l6-6 4 4 6-8"/><path d="M14 7h6v6"/></svg></span></div><div class="stat-val" id="stDay">—</div></div>
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Note moyenne</span><span class="stat-ico orange"><svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3z"/></svg></span></div><div class="stat-val" id="stNote">—</div></div>
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Fiches liées</span><span class="stat-ico"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1.5-1.5"/></svg></span></div><div class="stat-val" id="stLink">—</div></div>
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Top 3 local</span><span class="stat-ico green"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M6 4h12v4a6 6 0 0 1-12 0V4z"/><path d="M6 6H3v2a3 3 0 0 0 3 3M18 6h3v2a3 3 0 0 1-3 3"/></svg></span></div><div class="stat-val" id="stTop">—</div></div>
+<div class="stat"><div class="stat-top"><span class="stat-lbl">Objectif</span><span class="stat-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg></span></div><div class="stat-val" id="stObj">—</div><div class="objbar"><div class="objfill" id="objFill" style="width:0%"></div></div></div>
+</div>
+<div class="panel" id="cmds" style="display:none"></div>
+<div class="panel"><div class="panel-head"><h2>Évolution du total d'avis</h2><span class="n">toutes les fiches</span></div><div class="chartbox"><canvas id="chart" height="90"></canvas></div></div>
+<section class="panel" id="tableau">
+<div class="panel-head"><h2>Répertoire des fiches<span class="n" id="hNb2"></span></h2><span class="n">Clique sur une fiche pour son détail · plusieurs mots-clés : sépare-les par « | »</span></div>
+<div class="tools">
+<div class="filters met" id="metiers"></div>
+<div class="filters" id="filters">
+<button class="chip on" data-f="all" onclick="setF('all')">Toutes<b id="cAll">0</b></button>
+<button class="chip ok" data-f="objok" onclick="setF('objok')">Objectif atteint<b id="cObjOk">0</b></button>
+<button class="chip warn" data-f="objfar" onclick="setF('objfar')">Loin de l'objectif<b id="cObjFar">0</b></button>
+<button class="chip ok" data-f="top3" onclick="setF('top3')">Top 3<b id="cTop3">0</b></button>
+<button class="chip bad" data-f="rankbad" onclick="setF('rankbad')">Classement à travailler<b id="cRankBad">0</b></button>
+</div>
+</div>
+<div class="tablewrap"><table><thead><tr><th><input type="checkbox" class="selbox" id="selAll" onchange="selAllVisible(this.checked)" title="Cocher / décocher les fiches affichées"></th><th>#</th><th>Fiche / entreprise</th><th>Ville</th><th>Mots-clés de classement</th><th class="s" data-k="n" onclick="setS('n')">Avis</th><th class="s" data-k="note" onclick="setS('note')">Note</th><th class="s" data-k="pos" onclick="setS('pos')">Position</th><th class="s" data-k="pct" onclick="setS('pct')">Objectif</th><th>J-2·J-1·J</th></tr></thead>
+<tbody id="tbody"></tbody></table></div>
+</section>
+<div class="foot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#737183" stroke-width="2"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z"/></svg>R.Consulting · position = bloc local de Google Recherche (mobile) vu depuis la ville de la fiche · avis relevés à la demande</div>
+</main>
+</div>
+</div>
+<div class="sheet-bg" id="sheetBg" onclick="fermerFiche()"></div>
+<aside class="sheet" id="sheet" aria-label="Détail de la fiche"></aside>
+<div class="modal" id="modal"><div class="box">
+<h3>Ajouter une fiche</h3><p>Le nom tel qu'écrit sur Google, la ville, et le lien Maps de la fiche. Elle sera liée et suivie automatiquement.</p>
+<label>Nom de la fiche</label><input id="a_n" placeholder="ex : Couvreur Dupont Père & Fils">
+<label>Ville</label><input id="a_c" placeholder="ex : Antibes">
+<label>Lien Google Maps</label><input id="a_l" placeholder="https://maps.app.goo.gl/…">
+<label>Objectif (avis à gagner, facultatif)</label><input id="a_o" type="number" inputmode="numeric" placeholder="ex : 20">
+<label>Mot-clé de classement (facultatif)</label><input id="a_k" placeholder="ex : couvreur antibes — vide = automatique">
+<div class="row"><button class="btn btn-add" id="a_ok" onclick="ajouterFiche()">Ajouter</button><button class="btn btn-rank" onclick="$('modal').style.display='none'">Annuler</button></div>
+</div></div>
+<div class="modal" id="cmdModal"><div class="box">
+<h3>Commander des avis</h3><p>4 € l'avis · 8 € l'avis avec photos (10 € à partir de 3 photos) · paiement par tranche de 20 avis.</p>
+<label>Fiche</label><select id="c_f" onchange="cmdFicheChange()"></select>
+<div id="c_new" style="display:none">
+<label>Nom de la nouvelle fiche</label><input id="c_n" placeholder="ex : Couvreur Dupont Père & Fils">
+<label>Ville</label><input id="c_c" placeholder="ex : Antibes">
+<label>Lien Google Maps</label><input id="c_l" placeholder="https://maps.app.goo.gl/…">
+</div>
+<div class="c2">
+<div><label>Nombre d'avis</label><input id="c_t" type="number" inputmode="numeric" min="1" max="500" value="20" oninput="cmdPrix()"></div>
+<div><label>Par jour</label><select id="c_j" onchange="cmdPrix()"><option value="1">1 par jour</option><option value="2" selected>2 par jour</option><option value="3">3 par jour</option></select></div>
+</div>
+<div class="c2">
+<div><label>Dont avis avec photos</label><input id="c_p" type="number" inputmode="numeric" min="0" value="0" oninput="cmdPrix()"></div>
+<div><label>Photos par avis</label><select id="c_pp" onchange="cmdPrix()"><option value="1">1 photo (6 €)</option><option value="2">2 photos (7 €)</option><option value="3">3 photos (8 €)</option></select></div>
+</div>
+<div class="c2">
+<div><label>Début</label><input id="c_d" type="date"></div>
+<div><label>Note (facultatif)</label><input id="c_note" placeholder="ex : insister sur l'isolation"></div>
+</div>
+<div class="prix" id="c_prix"></div>
+<div class="row"><button class="btn btn-add" id="c_ok" onclick="envoyerCommande()">Commander</button><button class="btn btn-rank" onclick="$('cmdModal').style.display='none'">Annuler</button></div>
+</div></div>
+<script>
+const admin = location.search.includes('admin');
+const $ = id => document.getElementById(id);
+function msg(t){ $('msg').textContent = t || '' }
+let DATA = null, chart = null;
+
+function dates(hist){ return Object.keys(hist).sort() }
+function lastTwo(hist){ const d = dates(hist); return [d[d.length-1], d[d.length-2]] }
+
+async function load(){
+  try{
+    const r = await fetch('/.netlify/functions/data');
+    DATA = await r.json();
+    KW = DATA.kwover || {}; OBJ = DATA.objover || {}; LIV = DATA.livover || {}; RKW = DATA.rankKw || {};
+    render();
+  }catch(e){ msg('Erreur de chargement — réessaie dans une minute') }
+}
+
+var ROWS = [], FILT = 'all', MET = 'all', SORT = null, SDIR = 1, Q = '';
+// KW : mots-clés choisis dans le tableau (blob 'kw', « kw1 | kw2 »), OBJ : objectifs modifiés (blob 'obj'),
+// LIV : postés corrigés à la main (blob 'livres', admin), RKW : dernière position connue par mot-clé, SEL : fiches cochées.
+var KW = {}, OBJ = {}, LIV = {}, RKW = {}, SEL = new Set();
+function escAttr(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function norm(s){ return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function kwsOf(f){ return String(KW[f.name] || f.kw || '').split(/\s*[|;]\s*/).map(x => x.trim()).filter(Boolean).slice(0, 3); }
+function kwEff(f){ return kwsOf(f).join(' | '); }
+function objEff(f){ const o = OBJ[f.name]; return (o != null && o !== '') ? Number(o) : (f.obj ? Number(f.obj) : 0); }
+function livEff(f){ const l = LIV[f.name]; if (l != null && l !== '') return Number(l); return (f.livres != null && f.livres !== '') ? Number(f.livres) : null; }
+
+function setF(f){ FILT = f; document.querySelectorAll('#filters .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.f === f); }); applyView(); }
+function setS(k){
+  if (SORT === k) { SDIR = -SDIR; } else { SORT = k; SDIR = (k === 'pos') ? 1 : -1; }
+  document.querySelectorAll('thead th.s').forEach(function(th){
+    th.classList.remove('asc','desc');
+    if (th.dataset.k === SORT) th.classList.add(SDIR > 0 ? 'asc' : 'desc');
+  });
+  applyView();
+}
+function keep(r){
+  if (Q.trim() && r.search.indexOf(norm(Q.trim())) < 0) return false;
+  if (MET !== 'all' && r.metier !== MET) return false;
+  if (FILT === 'objok')   return r.hasObj && r.gained !== null && r.gained >= r.obj;
+  if (FILT === 'objfar')  return r.hasObj && r.gained !== null && r.gained < r.obj * 0.5;
+  if (FILT === 'top3')    return r.pos !== null && r.pos <= 3;
+  if (FILT === 'rankbad') return r.pos === null || r.pos > 3;
+  return true;
+}
+function applyView(){
+  var v = ROWS.filter(keep);
+  if (SORT) {
+    v = v.slice().sort(function(a,b){
+      var x = a[SORT], y = b[SORT];
+      // les valeurs absentes vont toujours en bas, quel que soit le sens du tri
+      if (x === null && y === null) return 0;
+      if (x === null) return 1;
+      if (y === null) return -1;
+      return (x < y ? -1 : x > y ? 1 : 0) * SDIR;
+    });
+  }
+  document.getElementById('tbody').innerHTML = v.length
+    ? v.map(function(r){ return r.html; }).join('')
+    : '<tr><td colspan="10" class="empty">aucune fiche ne correspond</td></tr>';
+  var all = document.getElementById('selAll'); if (all) all.checked = v.length > 0 && v.every(function(r){ return SEL.has(r.name); });
+}
+
+// Le metier se deduit du premier mot-cle : pas de champ a maintenir dans fiches.json.
+function metierOf(kw){
+  var k = norm(kw || '');
+  if (/^(deratisation|nuisible|exterminateur|traitement charpente)/.test(k)) return 'Nuisibles';
+  if (/^(elagage|elagueur)/.test(k)) return 'Élagage';
+  if (/^(depannage chaudiere|chaudiere|chauffagiste)/.test(k)) return 'Chaudière';
+  if (/^(pompe a chaleur|depannage pompe|pac)/.test(k)) return 'Pompe à chaleur';
+  if (/^(climatisation|clim)/.test(k)) return 'Clim';
+  if (/^(couvreur|toiturier|toiture|ferblantier|zingueur|dakwerker|recherche fuite)/.test(k)) return 'Toiture';
+  if (/^(terrassement|facade|facadier)/.test(k)) return 'Autre';
+  return 'Autre';
+}
+function setM(m){
+  MET = m;
+  document.querySelectorAll('#metiers .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.m === m); });
+  applyView();
+}
+function buildMetiers(rows){
+  var box = document.getElementById('metiers');
+  var noms = [];
+  rows.forEach(function(r){ if (noms.indexOf(r.metier) === -1) noms.push(r.metier); });
+  // un seul metier : la barre n'a aucun interet, on la masque
+  if (noms.length < 2) { box.style.display = 'none'; box.innerHTML = ''; MET = 'all'; return; }
+  box.style.display = '';
+  noms.sort();
+  var h = '<button class="chip met on" data-m="all" onclick="setM(\'all\')">Tous les métiers<b>' + rows.length + '</b></button>';
+  noms.forEach(function(n){
+    var c = rows.filter(function(r){ return r.metier === n; }).length;
+    h += '<button class="chip met" data-m="' + n + '" onclick="setM(\'' + n + '\')">' + n + '<b>' + c + '</b></button>';
+  });
+  box.innerHTML = h;
+  if (noms.indexOf(MET) === -1) MET = 'all';
+  document.querySelectorAll('#metiers .chip').forEach(function(c){ c.classList.toggle('on', c.dataset.m === MET); });
+}
+
+// ── Mots-clés, sélection, objectif et postés modifiables ──
+function kwCell(f, i){
+  var over = !!KW[f.name];
+  var h = '<div class="kwcell"><input class="kwin' + (over ? ' over' : '') + '" data-i="' + i + '" value="' + escAttr(kwEff(f)) + '"' +
+    ' onchange="saveKw(this)" onkeydown="if(event.key===\'Enter\')this.blur()"' +
+    ' title="' + (over ? 'Mots-clés personnalisés — fichier : ' + escAttr(f.kw) : 'Clique pour modifier ; plusieurs mots-clés séparés par |') + '">';
+  if (over) h += '<button class="kwrst" data-i="' + i + '" onclick="resetKw(this)" title="Revenir au mot-clé du fichier : ' + escAttr(f.kw) + '">↺</button>';
+  return h + '</div>';
+}
+function updSelBtn(){
+  var b = $('btnSel'); if (!b || b.disabled) return;
+  var rech = 0; (DATA ? DATA.fiches : []).forEach(function(f){ if (SEL.has(f.name)) rech += kwsOf(f).length; });
+  b.textContent = '📍 Classement des cochées (' + SEL.size + (SEL.size ? ' · ' + rech + ' rech. Google' : '') + ')';
+}
+function toggleSel(cb){
+  var n = DATA.fiches[parseInt(cb.dataset.i, 10)].name;
+  if (cb.checked) SEL.add(n); else SEL.delete(n);
+  updSelBtn();
+  var all = $('selAll'); if (all && !cb.checked) all.checked = false;
+}
+function selAllVisible(on){
+  document.querySelectorAll('#tbody .selbox').forEach(function(cb){
+    cb.checked = on;
+    var n = DATA.fiches[parseInt(cb.dataset.i, 10)].name;
+    if (on) SEL.add(n); else SEL.delete(n);
+  });
+  updSelBtn();
+}
+async function postOver(type, body){
+  const r = await fetch('/.netlify/functions/run?type=' + type, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'échec');
+  return j;
+}
+async function saveKw(inp){
+  const f = DATA.fiches[parseInt(inp.dataset.i, 10)];
+  const v = inp.value.split(/\s*[|;]\s*/).map(x => x.trim()).filter(Boolean).slice(0, 3).join(' | ');
+  if (!v) { inp.value = kwEff(f); return; }
+  if (v === kwEff(f)) return;
+  inp.disabled = true;
+  msg('Enregistrement des mots-clés de « ' + f.name + ' »…');
+  try {
+    if (v === f.kw) { const j = await postOver('setkw', { clear: [f.name] }); KW = j.kw || {}; }
+    else { const set = {}; set[f.name] = v; const j = await postOver('setkw', { set: set }); KW = j.kw || {}; }
+    SEL.add(f.name);
+    render();
+    msg('« ' + f.name + ' » → ' + v + ' ✓ — la fiche est cochée : clique « Classement des cochées » pour mesurer');
+  } catch (e) { msg('Mots-clés non enregistrés — ' + e.message); inp.disabled = false; inp.focus(); }
+}
+async function resetKw(btn){
+  const f = DATA.fiches[parseInt(btn.dataset.i, 10)];
+  btn.disabled = true;
+  try { const j = await postOver('setkw', { clear: [f.name] }); KW = j.kw || {}; render(); msg('« ' + f.name + ' » → mot-clé du fichier : ' + f.kw); }
+  catch (e) { msg('Réinitialisation impossible — ' + e.message); btn.disabled = false; }
+}
+// Objectif : modifiable par tout le monde (Rayan et son client). Vide = revenir à la valeur du fichier.
+async function editObj(i){
+  const f = DATA.fiches[i];
+  const cur = objEff(f);
+  const v = window.prompt('Objectif de « ' + f.name + ' » (nombre d\'avis à gagner) :', cur || '');
+  if (v === null) return;
+  const n = v.trim() === '' ? null : parseInt(v, 10);
+  if (n !== null && (isNaN(n) || n < 0)) { msg('Objectif invalide'); return; }
+  try {
+    if (n === null || n === Number(f.obj || 0)) { const j = await postOver('setobj', { clear: [f.name] }); OBJ = j.obj || {}; }
+    else { const set = {}; set[f.name] = n; const j = await postOver('setobj', { set: set }); OBJ = j.obj || {}; }
+    render(); msg('Objectif de « ' + f.name + ' » : ' + (objEff(f) ? '+' + objEff(f) : 'aucun') + ' ✓');
+  } catch (e) { msg('Objectif non enregistré — ' + e.message); }
+}
+// Postés : réservé à Rayan (?admin). Google peut retirer d'anciens avis qui ne sont pas les nôtres :
+// le total baisse, mais le nombre d'avis réellement postés par rapport à l'objectif se corrige ici.
+async function editLiv(i){
+  if (!admin) return;
+  const f = DATA.fiches[i];
+  const cur = livEff(f);
+  const v = window.prompt('Avis déjà postés pour « ' + f.name + ' » (vide = valeur du ménage : ' + (f.livres != null ? f.livres : '—') + ') :', cur != null ? cur : '');
+  if (v === null) return;
+  const n = v.trim() === '' ? null : parseInt(v, 10);
+  if (n !== null && (isNaN(n) || n < 0)) { msg('Valeur invalide'); return; }
+  try {
+    if (n === null) { const j = await postOver('setliv', { clear: [f.name] }); LIV = j.livres || {}; }
+    else { const set = {}; set[f.name] = n; const j = await postOver('setliv', { set: set }); LIV = j.livres || {}; }
+    render(); msg('Postés de « ' + f.name + ' » : ' + (livEff(f) != null ? '+' + livEff(f) : '—') + ' ✓');
+  } catch (e) { msg('Non enregistré — ' + e.message); }
+}
+// Les recherches Google sont soumises a DataForSEO sans attendre (async), puis lues toutes les 4 s
+// jusqu'a ce que chaque fiche ait sa position (2 min max). Avant, la fonction Netlify attendait
+// Google et etait tuee a 10 s : la moitie des fiches sortait en « timeout ».
+async function recolterTout(etat){
+  const res = [];
+  // Google met parfois plusieurs minutes a repondre via la file DataForSEO : on lit jusqu'a 5 min.
+  for (let t = 0; t < 48 && etat.attente > 0; t++) {
+    await new Promise(function(r){ setTimeout(r, 4000); });
+    msg('Lecture des résultats — ' + etat.releves + ' fiche(s) relevée(s), ' + etat.attente + ' en attente…');
+    try {
+      const r = await fetch('/.netlify/functions/run?type=rankfetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jobs: etat.jobs }) });
+      const j = await r.json();
+      if (Array.isArray(j.jobs)) etat.jobs = j.jobs;
+      etat.releves += (j.releves || 0); etat.attente = (j.en_attente || 0); etat.erreurs += (j.erreurs || 0); if (j.message) etat.motif = j.message;
+      Object.keys(j.parMotCle || {}).forEach(function(n){ const m = j.parMotCle[n]; res.push(n.split(' ').slice(0, 3).join(' ') + ' ' + Object.keys(m).map(function(k){ return k + (m[k] === null ? ' —' : ' #' + m[k]); }).join(', ')); });
+    } catch (e) {}
+    if (t % 3 === 2) await load();
+  }
+  await load();
+  return res;
+}
+async function runRankSel(){
+  const names = DATA.fiches.map(function(f){ return f.name; }).filter(function(n){ return SEL.has(n); });
+  if (!names.length) { msg('Coche d’abord les fiches à mesurer (case à gauche de chaque ligne)'); return; }
+  var rech = 0; DATA.fiches.forEach(function(f){ if (SEL.has(f.name)) rech += kwsOf(f).length; });
+  if (!confirm('Relever le classement de ' + names.length + ' fiche(s) ? (' + rech + ' recherche(s) Google)')) return;
+  $('btnSel').disabled = true;
+  const etat = { jobs: [], releves: 0, attente: 0, erreurs: 0, motif: null };
+  try {
+    msg('Envoi des recherches — ' + names.length + ' fiche(s)…');
+    const r = await fetch('/.netlify/functions/run?type=rankselect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ names: names }) });
+    const j = await r.json();
+    etat.jobs = j.jobs || []; etat.attente = (j.en_attente || 0); etat.erreurs += (j.erreurs || 0); if (j.message) etat.motif = j.message;
+    const res = await recolterTout(etat);
+    if (etat.releves === 0) msg('Aucun classement relevé' + (etat.motif ? ' — ' + etat.motif : '') + '. Les positions affichées datent du dernier relevé réussi.');
+    else msg('Classement ✓ ' + res.join(' · ') + (etat.erreurs ? ' — ' + etat.erreurs + ' en échec' + (etat.motif ? ' (' + etat.motif + ')' : '') : ''));
+  } catch (e) { msg('Erreur pendant le relevé — recharge et réessaie'); }
+  $('btnSel').disabled = false;
+  updSelBtn();
+}
+
+// ── Fiches ajoutées depuis le tracker (par le client ou Rayan) ──
+// Stockées dans le blob 'ajouts' du tracker, liées à Google à l'ajout, remontées dans le ménage
+// par la routine du matin (scripts/ajouts_trackers.py). Suppression en ?admin seulement.
+async function ajouterFiche(){
+  const n = $('a_n').value.trim(), c = $('a_c').value.trim(), l = $('a_l').value.trim(), o = $('a_o').value.trim(), k = $('a_k').value.trim();
+  if (!n || !c || !l) { msg('Nom, ville et lien Maps sont obligatoires'); return; }
+  if (!/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|www\.google\.[a-z.]+\/maps|maps\.google\.[a-z.]+)\//.test(l)) { msg('Le lien doit être un lien Google Maps (maps.app.goo.gl/… ou google.com/maps/…)'); return; }
+  const b = $('a_ok'); b.disabled = true; msg('Ajout et liaison de « ' + n + ' »…');
+  try {
+    const r = await fetch('/.netlify/functions/run?type=addfiche', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, city: c, link: l, obj: o, kw: k }) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'échec');
+    ['a_n','a_c','a_l','a_o','a_k'].forEach(id => $(id).value = '');
+    $('modal').style.display = 'none';
+    await load();
+    msg('« ' + n + ' » ajoutée' + (j.lie ? ' et liée à Google (' + j.avis + ' avis aujourd\'hui, mot-clé « ' + j.kw + ' »)' : ' — fiche Google non trouvée automatiquement, elle sera liée plus tard') + ' ✓');
+  } catch (e) { msg('Ajout impossible — ' + e.message); }
+  b.disabled = false;
+}
+async function supprimerFiche(id, nom){
+  if (!admin) return;
+  if (!confirm('Retirer « ' + nom + ' » du tracker ?')) return;
+  try {
+    const r = await fetch('/.netlify/functions/run?type=delfiche', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || 'échec');
+    await load(); msg('« ' + nom + ' » retirée');
+  } catch (e) { msg('Suppression impossible — ' + e.message); }
+}
+
+// ── Commande d'avis par le client : enregistrée dans Firebase (console de Rayan) + WhatsApp ──
+const FB_CMD = 'https://avis-tracker-default-rtdb.europe-west1.firebasedatabase.app/commandes_v1.json';
+let TRANCHE = 20;
+fetch('https://avis-tracker-default-rtdb.europe-west1.firebasedatabase.app/config_v1.json').then(r => r.json()).then(c => { const t = parseInt(c && c.tranche, 10); if (t > 0) { TRANCHE = t; const p = document.querySelector('#cmdModal p'); if (p) p.textContent = p.textContent.replace(/tranche de \d+ avis/, 'tranche de ' + t + ' avis'); } }).catch(() => {});
+const SITE_HOST = location.hostname;
+function ouvrirCommande(){
+  const sel = $('c_f'); sel.innerHTML = '';
+  ((DATA && DATA.fiches) || []).forEach((f, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = f.name + (f.city ? ' — ' + f.city : ''); sel.appendChild(o); });
+  const n = document.createElement('option'); n.value = 'new'; n.textContent = '+ Une nouvelle fiche…'; sel.appendChild(n);
+  if (!$('c_d').value) $('c_d').value = new Date().toISOString().slice(0, 10);
+  cmdFicheChange(); cmdPrix(); $('cmdModal').style.display = 'block';
+}
+function cmdFicheChange(){ $('c_new').style.display = $('c_f').value === 'new' ? 'block' : 'none'; }
+function cmdCalc(){
+  const t = Math.max(1, parseInt($('c_t').value || '0', 10) || 0), j = parseInt($('c_j').value, 10);
+  let p = Math.max(0, parseInt($('c_p').value || '0', 10) || 0); if (p > t) { p = t; $('c_p').value = t; }
+  const pp = parseInt($('c_pp').value, 10), prix = (t - p) * 4 + p * (pp >= 3 ? 10 : 8);
+  const tranches = Math.ceil(t / TRANCHE), premiere = Math.round(prix * Math.min(TRANCHE, t) / t), jours = Math.ceil(t / j);
+  return { t, j, p, pp, prix, tranches, premiere, jours };
+}
+function cmdPrix(){
+  const c = cmdCalc();
+  $('c_prix').innerHTML = '<b>' + c.prix + ' €</b> pour ' + c.t + ' avis' + (c.p ? ' dont ' + c.p + ' avec ' + c.pp + ' photo' + (c.pp > 1 ? 's' : '') : '') + ' · environ ' + c.jours + ' jour' + (c.jours > 1 ? 's' : '') +
+    '<small>' + (c.tranches > 1 ? c.tranches + ' tranches de ' + TRANCHE + ' avis · 1re tranche ' + c.premiere + ' €' : 'une seule tranche, ' + c.prix + ' €') + ' · le lien de paiement vous est envoyé à la validation, la tranche suivante après les 20 avis publiés</small>';
+}
+async function envoyerCommande(){
+  const c = cmdCalc(); let fiche, ville, lien;
+  if ($('c_f').value === 'new') {
+    fiche = $('c_n').value.trim(); ville = $('c_c').value.trim(); lien = $('c_l').value.trim();
+    if (!fiche || !ville || !lien) { msg('Nom, ville et lien Maps de la nouvelle fiche sont obligatoires'); return; }
+  } else {
+    const f = DATA.fiches[parseInt($('c_f').value, 10)]; if (!f) return; fiche = f.name; ville = f.city || ''; lien = f.link || '';
+  }
+  const b = $('c_ok'); b.disabled = true; msg('Envoi de la commande…');
+  try {
+    const client = (document.querySelector('.h-name') || {}).textContent || SITE_HOST;
+    const r = await fetch('/.netlify/functions/commande', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client: client.replace(/^Tracker\s*/i, '').trim(), fiche, ville, lien, total: c.t, parJour: c.j, photosNb: c.p, photosParCom: c.pp, debut: $('c_d').value, note: $('c_note').value.trim() }) });
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || 'échec');
+    if ($('c_f').value === 'new') { try { await fetch('/.netlify/functions/run?type=addfiche', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: fiche, city: ville, link: lien, obj: String(c.t), kw: '' }) }); } catch (e) {} }
+    $('cmdModal').style.display = 'none'; $('c_note').value = '';
+    msg('Commande enregistrée ✓ — ' + c.t + ' avis pour « ' + fiche + ' », ' + j.prix + ' €. Rayan vous envoie le lien de paiement de la première tranche.');
+    chargerCommandes(); if ($('c_f').value === 'new') load();
+  } catch (e) { msg('Commande impossible — ' + e.message); }
+  b.disabled = false;
+}
+async function chargerCommandes(){
+  try {
+    const all = await fetch(FB_CMD).then(r => r.json()) || {};
+    const L = Object.values(all).filter(x => x && x.site === SITE_HOST && x.statut !== 'refusee').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const box = $('cmds'); if (!L.length) { box.style.display = 'none'; return; }
+    const st = x => {
+      const payees = x.payees || 0, tranches = x.tranches || 1;
+      const payer = payees < tranches ? '<button class="btn btn-add" style="padding:6px 12px;font-size:.72rem" onclick="payerTranche(\'' + x.id + '\',this)">Payer la tranche ' + (payees + 1) + '/' + tranches + '</button>' : '';
+      if (x.statut === 'terminee') return '<span class="st ok">terminée</span>';
+      if (x.statut === 'integree' || x.statut === 'en cours' || x.statut === 'payee') return '<span class="st run">en cours · ' + (x.postes || 0) + '/' + x.total + (payees ? ' · ' + payees + '/' + tranches + ' tranche' + (payees > 1 ? 's' : '') + ' réglée' + (payees > 1 ? 's' : '') : '') + '</span>' + payer;
+      return '<span class="st">reçue</span>' + payer;
+    };
+    box.innerHTML = '<div class="cmds"><h4>Vos commandes</h4>' + L.map(x => '<div class="c"><div><b>' + escAttr(x.fiche) + '</b><small>' + x.total + ' avis · ' + x.parJour + '/j' + (x.photosNb ? ' · ' + x.photosNb + ' avec photos' : '') + ' · ' + x.prix + ' € · commandé le ' + String(x.date || '').slice(8, 10) + '/' + String(x.date || '').slice(5, 7) + '</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">' + st(x) + '</div></div>').join('') + '</div>';
+    box.style.display = 'block';
+  } catch (e) {}
+}
+async function payerTranche(id, btn){
+  if (btn) { btn.disabled = true; btn.textContent = 'Ouverture du paiement…'; }
+  try {
+    const r = await fetch('https://menageinformatique.netlify.app/.netlify/functions/paiement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commande: id }) });
+    const j = await r.json(); if (!j.ok || !j.url) throw new Error(j.error || 'échec');
+    location.href = j.url;
+  } catch (e) { msg('Paiement indisponible — ' + e.message); if (btn) { btn.disabled = false; btn.textContent = 'Payer'; } }
+}
+(function(){ const p = new URLSearchParams(location.search).get('paiement'); if (p === 'ok') msg('Paiement reçu, merci ✓ — la tranche démarre.'); else if (p === 'annule') msg('Paiement annulé, rien n\'a été débité.'); else if (p === 'attente') msg('Paiement en cours de confirmation.'); else if (p === 'erreur') msg('Le paiement n\'a pas pu être vérifié, écris à Rayan.'); })();
+chargerCommandes();
+
+// Rafraichit une seule fiche : un appel Google au lieu de tout le parc.
+async function refreshOne(btn){
+  const i = parseInt(btn.dataset.i, 10);
+  const f = (DATA && DATA.fiches) ? DATA.fiches[i] : null;
+  if (!f) return;
+  btn.disabled = true; btn.textContent = '…';
+  msg('Relevé de « ' + f.name + ' »…');
+  try {
+    const r = await fetch('/.netlify/functions/run?type=avis1&name=' + encodeURIComponent(f.name));
+    const j = await r.json();
+    if (j.ok) { msg(f.name + ' : ' + j.n + ' avis' + (j.r ? ' · ' + Number(j.r).toFixed(1) + ' ★' : '')); await load(); }
+    else { msg(f.name + ' : ' + (j.motif || 'échec')); btn.disabled = false; btn.textContent = '↻'; }
+  } catch (e) { msg('Erreur pendant le relevé'); btn.disabled = false; btn.textContent = '↻'; }
+}
+
+function render(){
+  const { fiches, avis, rank, ids, base } = DATA;
+  const BASE = base || {};
+  // Postés = avis marqués postés (champ livres recopié par sync_menage, ou corrigé à la main en admin).
+  // Quand il est connu, c'est lui qui alimente la jauge d'objectif : « Google − base » devient
+  // négatif dès que Google retire d'anciens avis, alors que les nôtres sont bien en ligne.
+  const postesDe = f => livEff(f);
+  // Les avis postes saisis a la main priment sur tout : ils comptent meme si la fiche n'a pas
+  // encore de base de reference ou pas encore de releve Google (fiche recemment ajoutee).
+  const gainDe = (f, n) => { const p = postesDe(f); if (p !== null) return p; if (n == null || BASE[f.name] == null) return null; return Math.max(0, n - BASE[f.name]); };
+  const hNb = document.getElementById('hNb'); if (hNb) hNb.textContent = fiches.length;
+  ['hNb2','navNb'].forEach(id => { const e = document.getElementById(id); if (e) e.textContent = fiches.length; });
+  const bC = document.getElementById('btnC3'); if (bC && !bC.disabled) bC.textContent = '🗓 3 jours (' + fiches.length + ' lectures Google)';
+  const bA = document.getElementById('btnAvis'); if (bA && !bA.disabled) bA.textContent = '↻ Actualiser AVIS (' + fiches.length + ' fiches · ' + (fiches.length * 0.02).toFixed(2).replace('.', ',') + ' $)';
+  if (admin) $('btnRecale').style.display = '';
+  // Un relevé du jour peut être partiel (vague en échec) : chaque fiche garde sa dernière valeur
+  // connue, l'avant-dernière sert à la variation. Sinon le total du jour tombait de 480 à 297.
+  const aNow = {}, aPrev = {};
+  dates(avis).forEach(d => { const s = avis[d] || {}; Object.keys(s).forEach(n => {
+    if (!s[n] || s[n].n == null) return;
+    if (aNow[n] !== undefined) aPrev[n] = aNow[n];
+    aNow[n] = s[n];
+  }); });
+  const rDates = dates(rank);
+  // Les vagues de classement ne tombent pas toutes le meme jour. On garde la derniere
+  // position connue de chaque fiche, et l'avant-derniere pour calculer l'evolution.
+  const rNow = {}, rPrev = {};
+  rDates.forEach(d => {
+    const snap = rank[d] || {};
+    Object.keys(snap).forEach(n => {
+      if (rNow[n] !== undefined) rPrev[n] = rNow[n];
+      rNow[n] = snap[n];
+    });
+  });
+
+  let total = 0, totPrev = 0, pairNow = 0, notes = [], linked = 0, top3 = 0;
+  const rows = fiches.map((f, i) => {
+    const a = aNow[f.name], ap = aPrev[f.name];
+    const pid = ids[f.name];
+    if (pid) linked++;
+    const n = a ? a.n : null;
+    if (n != null) total += n;
+    if (n != null && ap && ap.n != null) { pairNow += n; totPrev += ap.n; }
+    if (a && a.r) notes.push(a.r);
+    const pos = rNow[f.name] != null ? rNow[f.name] : null;
+    const posPrev = rPrev[f.name] != null ? rPrev[f.name] : null;
+    if (pos !== null && pos <= 3) top3++;
+
+    const dropped = a && ap && a.n < ap.n;
+    const dAvis = a && ap ? a.n - ap.n : null;
+    const dPos = (pos !== null && posPrev !== null) ? posPrev - pos : null;
+
+    const mapsUrl = pid
+      ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(f.name) + '&query_place_id=' + pid
+      : f.link;
+
+    let avisCell;
+    if (!pid) avisCell = '<span class="unlinked">non liée ⚠</span>';
+    else if (n == null) avisCell = '<span class="fcity">—</span>';
+    else {
+      avisCell = '<b title="Total actuel sur Google">' + n + '</b>';
+      if (dAvis) avisCell += '<span class="delta ' + (dAvis > 0 ? 'up' : 'down') + '">' + (dAvis > 0 ? '+' : '') + dAvis + '</span>';
+      if (dropped) avisCell += ' <span class="unlinked">⚠</span>';
+      avisCell += ' <button class="rf" data-i="' + i + '" onclick="refreshOne(this)" title="Actualiser cette fiche seule (1 appel Google)">↻</button>';
+    }
+    // Trois chiffres clairs : Google (total), Postés (+N), Perdus (−M anciens, seulement si négatif)
+    const postes = postesDe(f);
+    if (postes !== null || admin) {
+      const perdus = (postes !== null && BASE[f.name] != null && n != null) ? n - (BASE[f.name] + postes) : null;
+      avisCell += '<div class="cnt2"><span class="postes" title="Avis marqués postés">' + (postes !== null ? '+' + postes + ' postés' : '— postés') + '</span>' +
+        (LIV[f.name] != null && LIV[f.name] !== '' ? '<span class="manuel" title="corrigé à la main">manuel</span>' : '') +
+        (admin ? '<button class="edit" onclick="editLiv(' + i + ')" title="Corriger le nombre d\'avis postés (admin)">✎</button>' : '') +
+        ((perdus !== null && perdus < 0) ? '<span class="perdus" title="Google − (base + postés) : anciens avis retirés par Google">−' + Math.abs(perdus) + ' anciens</span>' : '') + '</div>';
+      if (f.commande && postes !== null) avisCell += '<div class="cmdb ' + (postes >= Number(f.commande) ? 'ok' : 'warn') + '">Commande : ' + postes + '/' + f.commande + '</div>';
+    }
+
+    let posCell;
+    if (pos === null) posCell = '<span class="pos none">—</span>';
+    else {
+      const cls = pos <= 3 ? 'top' : pos <= 10 ? 'mid' : 'low';
+      posCell = '<span class="pos ' + cls + '">#' + pos + '</span>';
+      if (dPos) posCell += '<span class="delta ' + (dPos > 0 ? 'up' : 'down') + '">' + (dPos > 0 ? '▲' + dPos : '▼' + Math.abs(dPos)) + '</span>';
+    }
+    // positions des autres mots-clés (dernier relevé connu par mot-clé)
+    const kws = kwsOf(f), rk = RKW[f.name] || {};
+    kws.slice(1).forEach(k => {
+      const e = rk[k];
+      posCell += '<div class="poskw" title="' + escAttr(k) + (e ? ' · relevé le ' + e.date : '') + '">' + escAttr(k.length > 26 ? k.slice(0, 24) + '…' : k) + ' <b' + (e && e.pos !== null && e.pos <= 3 ? ' class="top"' : '') + '>' + (e ? (e.pos === null ? 'absent' : '#' + e.pos) : '—') + '</b></div>';
+    });
+
+    const star = (a && a.r) ? '<span class="star">' + a.r.toFixed(1) + ' ★</span>' : '<span class="fcity">—</span>';
+    const obj = objEff(f);
+    const objMan = (OBJ[f.name] != null && OBJ[f.name] !== '') ? '<span class="manuel">modifié</span>' : '';
+    let objCell;
+    const gainNow = gainDe(f, n);
+    if (obj && gainNow !== null) {
+      const gained = gainNow;
+      const pct = Math.min(100, Math.round(gained / obj * 100));
+      const doneCls = gained >= obj ? ' done' : '';
+      const fillCls = gained >= obj ? '' : ' part';
+      objCell = '<div class="objcell" onclick="editObj(' + i + ')" title="Clique pour modifier l\'objectif"><span class="objtxt' + doneCls + '">+' + gained + ' / +' + obj + (gained >= obj ? ' ✓' : '') + '</span>' + objMan +
+        '<div class="minibar"><div class="minifill' + fillCls + '" style="width:' + pct + '%"></div></div></div>';
+    } else if (obj) {
+      objCell = '<div class="objcell" onclick="editObj(' + i + ')" title="Clique pour modifier l\'objectif"><span class="fcity">+0 / +' + obj + '</span>' + objMan + '</div>';
+    } else {
+      objCell = '<div class="objcell" onclick="editObj(' + i + ')" title="Clique pour fixer un objectif"><span class="fcity">— ✎</span></div>';
+    }
+    const alertCls = (!pid || dropped) ? ' class="alert"' : '';
+    const _html = '<tr' + alertCls + '><td class="c-sel"><input type="checkbox" class="selbox" data-i="' + i + '"' + (SEL.has(f.name) ? ' checked' : '') + ' onchange="toggleSel(this)"></td><td class="fcity c-num">' + String(i+1).padStart(2,'0') + '</td>' +
+      '<td class="c-nom"><button class="biz" onclick="ouvrirFiche(' + i + ')"><span class="biz-ico">' + escAttr(String(f.name).trim().slice(0,1).toUpperCase()) + '</span><span><span class="fname">' + f.name + '</span></span></button> <a class="maps" href="' + mapsUrl + '" target="_blank" rel="noopener">Maps ↗</a>' +
+        (f.ajout ? '<div class="ajout">ajoutée le ' + (f.ajout.date || '') + (admin ? ' <button class="del" onclick="supprimerFiche(\'' + f.ajout.id + '\',\'' + escAttr(f.name).replace(/'/g, "\\'") + '\')" title="Retirer cette fiche (admin)">✕</button>' : '') + '</div>' : '') + '</td>' +
+      '<td class="fcity" data-label="Ville">' + f.city + '</td><td class="c-kw" data-label="Mots-clés">' + kwCell(f, i) + '</td><td data-label="Avis">' + avisCell + '</td><td data-label="Note">' + star + '</td><td data-label="Position">' + posCell + '</td><td data-label="Objectif">' + objCell + '</td>' + c3cell(f.name) + '</tr>';
+    const _hasObj = !!obj;
+    const _gained = _hasObj ? gainNow : null;
+    return { html: _html, name: f.name, metier: metierOf(kws[0] || f.kw), pos: pos, n: n, note: (a && a.r) ? a.r : null,
+             hasObj: _hasObj, obj: obj, gained: _gained,
+             pct: (_hasObj && _gained !== null) ? _gained / obj : null,
+             search: norm(f.name + ' ' + f.city + ' ' + kws.join(' ') + ' ' + (f.region || '')) };
+  });
+
+  ROWS = rows;
+  const _nObjOk  = rows.filter(r => r.hasObj && r.gained !== null && r.gained >= r.obj).length;
+  const _nObjFar = rows.filter(r => r.hasObj && r.gained !== null && r.gained < r.obj * 0.5).length;
+  $('cAll').textContent = rows.length;
+  $('cObjOk').textContent = _nObjOk;
+  $('cObjFar').textContent = _nObjFar;
+  $('cTop3').textContent = rows.filter(r => r.pos !== null && r.pos <= 3).length;
+  $('cRankBad').textContent = rows.filter(r => r.pos === null || r.pos > 3).length;
+  // un tracker sans objectifs n'affiche pas les filtres d'objectif
+  const _anyObj = rows.some(r => r.hasObj);
+  document.querySelectorAll('#filters .chip[data-f="objok"],#filters .chip[data-f="objfar"]')
+    .forEach(c => { c.style.display = _anyObj ? '' : 'none'; });
+  buildMetiers(rows);
+  applyView();
+  updSelBtn();
+  const dTot = totPrev ? pairNow - totPrev : 0;
+  $('stTotal').innerHTML = total + (dTot > 0 ? '<small>+' + dTot + '</small>' : '');
+  $('stDay').textContent = totPrev ? ((dTot > 0 ? '+' : '') + dTot) : '—';
+  $('stNote').textContent = notes.length ? (notes.reduce((a,b)=>a+b,0)/notes.length).toFixed(2) + ' ★' : '—';
+  $('stLink').textContent = linked + ' / ' + fiches.length;
+  $('stTop').textContent = top3;
+  let gTot = 0, gObj = 0;
+  fiches.forEach(f => {
+    const o = objEff(f); if (!o) return;
+    gObj += o;
+    const a = aNow[f.name];
+    const g = gainDe(f, (a && a.n != null) ? a.n : null); if (g !== null) gTot += g;
+  });
+  $('stObj').textContent = gObj ? '+' + gTot + ' / +' + gObj : '—';
+  $('objFill').style.width = (gObj ? Math.min(100, gTot / gObj * 100) : 0) + '%';
+
+  const ds = dates(avis);
+  // Même règle pour la courbe : un jour où seule une partie des fiches a été relevée ne fait plus
+  // plonger le total, chaque fiche garde sa dernière valeur connue.
+  const connu = {};
+  const totals = ds.map(d => { const s = avis[d] || {}; Object.keys(s).forEach(n => { if (s[n] && s[n].n != null) connu[n] = s[n].n; }); return Object.values(connu).reduce((a, b) => a + b, 0); });
+  if (chart) chart.destroy();
+  chart = new Chart($('chart'), {
+    type: 'line',
+    data: { labels: ds, datasets: [{ label: 'Total avis du réseau', data: totals, borderColor: '#763ce0', backgroundColor: 'rgba(118,60,224,.08)', fill: true, tension: .3, pointRadius: 3 }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 10 } }, grid: { display: false } }, y: { ticks: { font: { size: 10 } } } } }
+  });
+}
+
+async function runAvis(){
+  $('btnAvis').disabled = true;
+  // Une requete par vague de 12 fiches : en une seule requete, la fonction Netlify
+  // depassait sa limite de 10 s et etait tuee en cours de route.
+  const n = (DATA && DATA.fiches) ? DATA.fiches.length : 12;
+  const vagues = [];
+  for (let s = 0; s < n; s += 12) vagues.push(s);
+  let releves = 0, echecs = 0;
+  try{
+    for (let i = 0; i < vagues.length; i++) {
+      msg('Relevé des avis — ' + (i+1) + '/' + vagues.length + ' (' + releves + ' fiche(s))…');
+      try {
+        const r = await fetch('/.netlify/functions/run?type=avis&start=' + vagues[i]);
+        const j = await r.json();
+        releves += (j.releves || 0);
+        if (!j.releves) echecs++;
+      } catch (e) { echecs++; }
+      await load();
+    }
+    if (releves === 0) msg('Aucun avis relevé — réessaie dans une minute');
+    else if (echecs) msg(releves + ' fiche(s) relevée(s), ' + echecs + ' vague(s) en échec — reclique pour compléter');
+    else msg('Avis relevés ✓ (' + releves + ' fiches)');
+  }catch(e){ msg('Relevé interrompu — recharge la page') }
+  $('btnAvis').disabled = false;
+}
+
+async function runRank(){
+  var rech = 0; (DATA ? DATA.fiches : []).forEach(function(f){ rech += kwsOf(f).length; });
+  if(!confirm('Relever les classements de toutes les fiches maintenant ? (' + rech + ' recherches Google)')) return;
+  $('btnRank').disabled = true;
+  const n = (DATA && DATA.fiches ? DATA.fiches.length : 43);
+  const waves = [];
+  for (let s = 0; s < n; s += 5) waves.push(s);
+  const etat = { jobs: [], releves: 0, attente: 0, erreurs: 0, motif: null };
+  try{
+    msg('Envoi des recherches — vague 1 / ' + waves.length + '…');
+    const r = await fetch('/.netlify/functions/run?type=rank&start=0' + (admin ? '&force=1' : ''));
+    if (r.status === 429) {
+      const j = await r.json();
+      msg('Classements déjà relevés récemment — prochain relevé possible dans ~' + j.cooldown + 'h');
+      $('btnRank').disabled = false; return;
+    }
+    const compte = async (rep) => {
+      try { const j = await rep.json(); etat.jobs = etat.jobs.concat(j.jobs || []); etat.attente += (j.en_attente || 0); etat.erreurs += (j.erreurs || 0); if (j.message) etat.motif = j.message; }
+      catch (e) { etat.erreurs++; }
+    };
+    await compte(r);
+    for (let i = 1; i < waves.length; i++) {
+      msg('Envoi des recherches — vague ' + (i+1) + ' / ' + waves.length + '…');
+      await compte(await fetch('/.netlify/functions/run?type=rank&force=1&start=' + waves[i]));
+    }
+    await recolterTout(etat);
+    // Fiches sans position (soumission refusee ou recherche en erreur) : jusqu'a 4 nouvelles
+    // tentatives espacees de 30 s (recherche refusee ou page Google sans bloc local).
+    for (let passe = 0; passe < 4; passe++) {
+      const manquantes = DATA.fiches.map(function(f){ return f.name; }).filter(function(n){ return !etat.jobs.some(function(j){ return j.name === n && j.fait && !j.err; }); });
+      if (!manquantes.length || manquantes.length >= n) break;
+      msg('Nouvelle tentative ' + (passe + 1) + '/4 pour ' + manquantes.length + ' fiche(s) dans 30 s…');
+      await new Promise(function(r){ setTimeout(r, 30000); });
+      try {
+        const r2 = await fetch('/.netlify/functions/run?type=rankselect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ names: manquantes.slice(0, 40) }) });
+        const j2 = await r2.json();
+        etat.jobs = etat.jobs.filter(function(j){ return j.fait && !j.err; }).concat(j2.jobs || []); etat.attente = (j2.en_attente || 0); if (j2.message) etat.motif = j2.message;
+        await recolterTout(etat);
+      } catch (e) {}
+    }
+    etat.erreurs = DATA.fiches.filter(function(f){ return !etat.jobs.some(function(j){ return j.name === f.name && j.fait && !j.err; }); }).length; etat.attente = 0;
+    if (etat.releves === 0) msg('Aucun classement relevé' + (etat.motif ? ' — ' + etat.motif : '') + '. Les positions affichées datent du dernier relevé réussi.');
+    else if (etat.erreurs || etat.attente) msg(etat.releves + ' fiche(s) relevée(s), ' + (etat.erreurs + etat.attente) + ' en échec' + (etat.motif ? ' — ' + etat.motif : '') + '. Les autres gardent leur dernière position connue.');
+    else msg('Classements à jour ✓ (' + etat.releves + ' fiches)');
+  }catch(e){ msg('Erreur pendant le relevé — recharge et réessaie'); }
+  $('btnRank').disabled = false;
+}
+
+load();
+
+let C3=null,C3DAYS=null;
+function c3cell(name){
+  if(!C3)return '<td class="fcity c-c3"></td>';
+  const c=C3[name];
+  if(!c)return '<td class="fcity c-c3" data-label="3 jours">—</td>';
+  if(c.err)return '<td class="fcity c-c3" data-label="3 jours" title="'+c.err+'">⚠</td>';
+  const f=v=>v>0?'<b>'+v+'</b>':'<span style="color:#c9ccd2">0</span>';
+  return '<td class="c-c3" data-label="3 jours" style="font-family:\'DM Mono\',monospace;font-size:.72rem;white-space:nowrap">'+f(c.j2)+' · '+f(c.j1)+' · '+f(c.j0)+'</td>';
+}
+async function runC3(){
+  const b=$('btnC3');b.disabled=true;
+  C3={};
+  const NN=DATA.fiches?DATA.fiches.length:0;
+  let jobs=[],motif=null;
+  // Lectures soumises a DataForSEO par paquets de 20 fiches, puis relues toutes les 5 s (Google repond en 1 a 2 min)
+  for(let s=0;s<NN;s+=20){
+    msg('Comptage 3 jours — envoi des fiches '+(s+1)+'–'+Math.min(s+20,NN)+' / '+NN+'…');
+    try{
+      const j=await fetch('/.netlify/functions/count3j?start='+s+'&n=20').then(r=>r.json());
+      if(j.days)C3DAYS=j.days; Object.assign(C3,j.results||{}); jobs=jobs.concat(j.jobs||[]); if(j.erreur)motif=j.erreur;
+    }catch(e){}
+  }
+  render();
+  for(let t=0;t<60&&jobs.length;t++){
+    await new Promise(r=>setTimeout(r,5000));
+    msg('Comptage 3 jours — '+Object.keys(C3).length+' / '+NN+' fiches lues…');
+    try{
+      const j=await fetch('/.netlify/functions/count3j',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jobs})}).then(r=>r.json());
+      if(j.days)C3DAYS=j.days; Object.assign(C3,j.results||{}); if(Array.isArray(j.jobs))jobs=j.jobs;
+      render();
+    }catch(e){}
+  }
+  let t0=0,t1=0,t2=0;
+  for(const k in C3){const c=C3[k];if(c&&!c.err){t0+=c.j0;t1+=c.j1;t2+=c.j2;}}
+  msg('3 jours ✓ — avant-hier '+t2+' · hier '+t1+' · aujourd\'hui '+t0+' (avis visibles sur Google)'+(jobs.length?' · '+jobs.length+' fiche(s) sans réponse':'')+(motif?' — '+motif:''));
+  b.disabled=false;
+}
+async function recaleBase(){
+  if(!C3){msg('Lance d\'abord le comptage 3 jours.');return}
+  const deltas={};let tot=0;
+  for(const k in C3){const c=C3[k];if(c&&!c.err){const d=(c.j0||0)+(c.j1||0)+(c.j2||0);if(d>0){deltas[k]=d;tot+=d;}}}
+  if(!tot){msg('Rien à recaler — 0 avis comptés sur 3 jours.');return}
+  if(!confirm('Décaler la base de '+tot+' avis au total (les avis des 3 derniers jours comptent dans l\'objectif) ?'))return;
+  const b=$('btnRecale');b.disabled=true;msg('Recalage en cours…');
+  try{
+    const r=await fetch('/.netlify/functions/setbase',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({deltas})});
+    const j=await r.json();
+    if(j.ok){msg('Base recalée (-'+tot+') ✓ — rechargement…');await load();}
+    else msg('Erreur recalage');
+  }catch(e){msg('Erreur recalage : '+e)}
+  b.disabled=false;
+}
+
+// ── Panneau de détail d'une fiche (Aperçu · Avis · Positions · Réglages) ──
+function navOn(a){ document.querySelectorAll('.nav a').forEach(x => x.classList.toggle('on', x === a)); }
+let SHEET_I = null, sheetChart = null;
+function fermerFiche(){ $('sheet').classList.remove('open'); $('sheetBg').classList.remove('open'); SHEET_I = null; if (sheetChart) { sheetChart.destroy(); sheetChart = null; } }
+function ouvrirFiche(i, tab){
+  SHEET_I = i; const f = DATA.fiches[i]; if (!f) return;
+  const avis = DATA.avis || {}, rank = DATA.rank || {}, ids = DATA.ids || {}, base = DATA.base || {};
+  const ds = dates(avis).filter(d => avis[d] && avis[d][f.name] && avis[d][f.name].n != null);
+  const hist = ds.map(d => ({ d, n: avis[d][f.name].n, r: avis[d][f.name].r }));
+  const last = hist[hist.length - 1], prev = hist[hist.length - 2];
+  const rDates = dates(rank).filter(d => rank[d] && rank[d][f.name] !== undefined);
+  const rHist = rDates.map(d => ({ d, p: rank[d][f.name] }));
+  const rLast = rHist[rHist.length - 1];
+  const pid = ids[f.name], obj = objEff(f), postes = livEff(f);
+  const gained = (postes !== null) ? postes : ((last && last.n != null && base[f.name] != null) ? Math.max(0, last.n - base[f.name]) : null);
+  const mapsUrl = pid ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(f.name) + '&query_place_id=' + pid : f.link;
+  const rk = RKW[f.name] || {}, kws = kwsOf(f);
+  const posTxt = p => p === undefined ? '—' : p === null ? 'absent du bloc local' : '#' + p;
+  const posCls = p => p != null && p <= 3 ? 'top' : p != null && p <= 10 ? 'mid' : 'none';
+  const h = '<button class="close" onclick="fermerFiche()" aria-label="Fermer">✕</button>' +
+    '<div class="eyebrow">' + escAttr(f.city || '') + (f.region ? ' · ' + escAttr(f.region) : '') + '</div><h2>' + escAttr(f.name) + '</h2>' +
+    '<div class="sub">' + (last ? last.n + ' avis au dernier relevé (' + last.d + ')' : 'Aucun relevé d\'avis') + (rLast ? ' · position ' + posTxt(rLast.p) + ' le ' + rLast.d : '') + '</div>' +
+    '<a class="maps" href="' + escAttr(mapsUrl) + '" target="_blank" rel="noopener">Ouvrir la fiche Google Maps ↗</a>' +
+    '<div class="tabs">' + [['apercu','Aperçu'],['avis','Avis'],['pos','Positions'],['reg','Réglages']].map(t => '<button class="' + ((tab || 'apercu') === t[0] ? 'on' : '') + '" onclick="sheetTab(\'' + t[0] + '\')">' + t[1] + '</button>').join('') + '</div>' +
+    // Aperçu
+    '<div class="tab' + ((tab || 'apercu') === 'apercu' ? ' on' : '') + '" data-t="apercu"><div class="kv">' +
+      '<div class="k"><label>Avis Google</label><div class="v">' + (last ? last.n : '—') + (prev && last && last.n !== prev.n ? ' <span class="delta ' + (last.n > prev.n ? 'up' : 'down') + '">' + (last.n > prev.n ? '+' : '') + (last.n - prev.n) + '</span>' : '') + '</div></div>' +
+      '<div class="k"><label>Note</label><div class="v">' + (last && last.r ? last.r.toFixed(1) + ' <small>★</small>' : '—') + '</div></div>' +
+      '<div class="k"><label>Position locale</label><div class="v"><span class="pos ' + posCls(rLast ? rLast.p : undefined) + '">' + (rLast ? (rLast.p === null ? 'absent' : '#' + rLast.p) : '—') + '</span><small> ' + escAttr(kws[0] || '') + '</small></div></div>' +
+      '<div class="k"><label>Objectif</label><div class="v">' + (obj ? '+' + (gained !== null ? gained : 0) + ' <small>/ +' + obj + '</small>' : '—') + '</div>' + (obj ? '<div class="minibar"><div class="minifill" style="width:' + Math.min(100, Math.round((gained || 0) / obj * 100)) + '%"></div></div>' : '') + '</div>' +
+      '<div class="k"><label>Postés</label><div class="v">' + (postes !== null ? '+' + postes : '—') + (f.commande ? ' <small>/ ' + f.commande + ' commandés</small>' : '') + '</div></div>' +
+      '<div class="k"><label>Liaison Google</label><div class="v" style="font-size:.9rem">' + (pid ? '<span style="color:var(--ok)">liée ✓</span>' : '<span style="color:var(--bad)">non liée</span>') + (base[f.name] != null ? '<small> · base ' + base[f.name] + ' avis</small>' : '') + '</div></div>' +
+    '</div><div class="row"><button class="btn btn-avis" onclick="ouvrirCommandePour(' + i + ')">🛒 Commander des avis pour cette fiche</button>' + (pid ? '<button class="btn" data-i="' + i + '" onclick="refreshOne(this)">↻ Actualiser cette fiche</button>' : '') + '</div></div>' +
+    // Avis
+    '<div class="tab' + (tab === 'avis' ? ' on' : '') + '" data-t="avis">' + (hist.length > 1 ? '<canvas id="sheetChart" height="120"></canvas>' : '<p class="note">Deux relevés sont nécessaires pour tracer l\'évolution.</p>') +
+      '<div class="hist">' + (hist.length ? hist.slice().reverse().slice(0, 40).map((x, k, all) => { const p = all[k + 1]; return '<div class="hrow"><span class="dot"></span><div><b>' + x.n + ' avis</b>' + (p ? ' <span class="delta ' + (x.n - p.n < 0 ? 'down' : 'up') + '">' + (x.n - p.n > 0 ? '+' : '') + (x.n - p.n) + '</span>' : '') + '<small>' + x.d + (x.r ? ' · ' + x.r.toFixed(1) + ' ★' : '') + '</small></div></div>'; }).join('') : '<p class="note">Aucun relevé.</p>') + '</div></div>' +
+    // Positions
+    '<div class="tab' + (tab === 'pos' ? ' on' : '') + '" data-t="pos"><div class="kv">' + kws.map((k, ki) => { let e = rk[k]; if (!e && ki === 0 && rLast) e = { pos: rLast.p, date: rLast.d }; return '<div class="k"><label>' + escAttr(k) + '</label><div class="v"><span class="pos ' + posCls(e ? e.pos : undefined) + '">' + (e ? (e.pos === null ? 'absent' : '#' + e.pos) : '—') + '</span>' + (e ? '<small> le ' + e.date + '</small>' : '') + '</div></div>'; }).join('') + '</div>' +
+      '<p class="note">Bloc local de Google Recherche, mobile, vu depuis ' + escAttr(f.city || 'la ville de la fiche') + '. « absent » = pas dans les adresses affichées.</p>' +
+      '<div class="hist">' + (rHist.length ? rHist.slice().reverse().slice(0, 40).map((x, k, all) => { const p = all[k + 1]; const d = (p && p.p != null && x.p != null) ? p.p - x.p : null; return '<div class="hrow"><span class="dot" style="background:' + (x.p != null && x.p <= 3 ? 'var(--ok)' : x.p == null ? 'var(--muted)' : 'var(--warn)') + '"></span><div><b>' + posTxt(x.p) + '</b>' + (d ? ' <span class="delta ' + (d > 0 ? 'up' : 'down') + '">' + (d > 0 ? '▲' + d : '▼' + Math.abs(d)) + '</span>' : '') + '<small>' + x.d + ' · ' + escAttr(kws[0] || '') + '</small></div></div>'; }).join('') : '<p class="note">Aucun classement relevé.</p>') + '</div></div>' +
+    // Réglages
+    '<div class="tab' + (tab === 'reg' ? ' on' : '') + '" data-t="reg">' +
+      '<label class="field">Mots-clés de classement (jusqu\'à 3, séparés par |)</label>' + kwCell(f, i).replace('class="kwin', 'class="kwin in') +
+      '<label class="field">Objectif (avis à gagner)</label><div class="row" style="margin-top:0"><span class="pos ' + (gained !== null && obj && gained >= obj ? 'top' : 'none') + '">' + (obj ? '+' + obj : '—') + '</span><button class="btn" onclick="editObj(' + i + ')">Modifier l\'objectif</button></div>' +
+      (admin ? '<label class="field">Avis postés (admin)</label><div class="row" style="margin-top:0"><span class="pos none">' + (postes !== null ? '+' + postes : '—') + '</span><button class="btn" onclick="editLiv(' + i + ')">Corriger les postés</button></div>' : '') +
+      (f.ajout ? '<p class="note">Fiche ajoutée le ' + escAttr(f.ajout.date || '') + (admin ? ' · <button class="del" onclick="supprimerFiche(\'' + f.ajout.id + '\',\'' + escAttr(f.name).replace(/'/g, "\\'") + '\')">retirer</button>' : '') + '</p>' : '') +
+    '</div>';
+  $('sheet').innerHTML = h; $('sheet').classList.add('open'); $('sheetBg').classList.add('open');
+  if (sheetChart) { sheetChart.destroy(); sheetChart = null; }
+  const cv = document.getElementById('sheetChart');
+  if (cv && hist.length > 1) sheetChart = new Chart(cv, { type: 'line', data: { labels: hist.map(x => x.d), datasets: [{ data: hist.map(x => x.n), borderColor: '#763ce0', backgroundColor: 'rgba(118,60,224,.08)', fill: true, tension: .3, pointRadius: 3 }] },
+    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 9 } } }, y: { ticks: { font: { size: 9 } }, beginAtZero: false } } } });
+}
+function sheetTab(t){ document.querySelectorAll('#sheet .tabs button').forEach((b, k) => b.classList.toggle('on', ['apercu','avis','pos','reg'][k] === t)); document.querySelectorAll('#sheet .tab').forEach(x => x.classList.toggle('on', x.dataset.t === t)); }
+function ouvrirCommandePour(i){ fermerFiche(); ouvrirCommande(); const s = $('c_f'); if (s) { s.value = String(i); cmdFicheChange(); } }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { fermerFiche(); } });
+
+</script></body></html>

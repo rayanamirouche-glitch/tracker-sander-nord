@@ -1,0 +1,46 @@
+[
+ {
+  "name": "Expérience et professionnalisme sd toiture. Votre couvreur de confiance à Lille",
+  "q": "sd toiture couvreur lille",
+  "target": "sd toiture",
+  "ll": "50.6367,3.0655",
+  "kw": "couvreur lille",
+  "city": "Lille",
+  "link": "https://maps.app.goo.gl/tQu8RzcaGnwSGTV4A",
+  "region": "Nord",
+  "obj": 5
+ },
+ {
+  "name": "SD Père & Fils – couvreur à Lomme",
+  "q": "sd père & fils couvreur lomme",
+  "target": "sd pere & fils",
+  "ll": "50.6428,2.9813",
+  "kw": "couvreur lomme",
+  "city": "Lomme",
+  "link": "https://maps.app.goo.gl/pBTDzJPcWfiLLyiP8",
+  "region": "Nord",
+  "obj": 5
+ },
+ {
+  "name": "Couvreur Lambersart | renov Maison SD Couverture",
+  "q": "renov maison sd couverture couvreur lambersart",
+  "target": "sd couverture",
+  "ll": "50.6592,3.0349",
+  "kw": "couvreur lambersart",
+  "city": "Lambersart",
+  "link": "https://maps.app.goo.gl/EE4aKyWCQYJZMqDTA",
+  "region": "Nord",
+  "obj": 5
+ },
+ {
+  "name": "Couvreur La Madeleine — SD, deux générations sur les toits atelier maître artisan",
+  "q": "sd couvreur la madeleine",
+  "target": "couvreur la madeleine sd",
+  "ll": "50.6568,3.0746",
+  "kw": "couvreur la madeleine",
+  "city": "La Madeleine",
+  "link": "https://maps.app.goo.gl/c5mpsMSHYi9PyXCK6",
+  "region": "Nord",
+  "obj": 5
+ }
+]

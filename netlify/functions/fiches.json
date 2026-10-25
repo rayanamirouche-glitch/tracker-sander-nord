@@ -8,7 +8,9 @@
   "city": "Lille",
   "link": "https://maps.app.goo.gl/tQu8RzcaGnwSGTV4A",
   "region": "Nord",
-  "obj": 5
+  "obj": 5,
+  "kg": "/g/11zx_8qgpn",
+  "cid": "4825351876386303349"
  },
  {
   "name": "SD Père & Fils – couvreur à Lomme",
@@ -19,7 +21,9 @@
   "city": "Lomme",
   "link": "https://maps.app.goo.gl/pBTDzJPcWfiLLyiP8",
   "region": "Nord",
-  "obj": 5
+  "obj": 5,
+  "kg": "/g/11p1f5f_gf",
+  "cid": "4892204648942773335"
  },
  {
   "name": "Couvreur Lambersart | renov Maison SD Couverture",
@@ -41,6 +45,8 @@
   "city": "La Madeleine",
   "link": "https://maps.app.goo.gl/c5mpsMSHYi9PyXCK6",
   "region": "Nord",
-  "obj": 5
+  "obj": 5,
+  "kg": "/g/11zx_fmqz3",
+  "cid": "3500450514530552561"
  }
 ]

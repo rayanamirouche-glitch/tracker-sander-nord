@@ -26,15 +26,17 @@
   "cid": "4892204648942773335"
  },
  {
-  "name": "Couvreur Lambersart | renov Maison SD Couverture",
-  "q": "renov maison sd couverture couvreur lambersart",
-  "target": "sd couverture",
-  "ll": "50.6592,3.0349",
+  "name": "Un couvreur à Lambersart : Le Traceur de Toits",
+  "q": "le traceur de toits couvreur lambersart",
+  "target": "le traceur de toits",
+  "ll": "50.6436,3.0207",
   "kw": "couvreur lambersart",
   "city": "Lambersart",
-  "link": "https://maps.app.goo.gl/EE4aKyWCQYJZMqDTA",
+  "link": "https://maps.app.goo.gl/zJYUefFjirMf3Ft6A",
   "region": "Nord",
-  "obj": 5
+  "obj": 5,
+  "kg": "/g/11p28v4b2d",
+  "cid": "12175690450222784355"
  },
  {
   "name": "Couvreur La Madeleine — SD, deux générations sur les toits atelier maître artisan",

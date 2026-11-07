@@ -39,9 +39,9 @@
   "cid": "12175690450222784355"
  },
  {
-  "name": "Couvreur La Madeleine — SD, deux générations sur les toits atelier maître artisan",
-  "q": "sd couvreur la madeleine",
-  "target": "couvreur la madeleine sd",
+  "name": "Couvreur SD",
+  "q": "couvreur sd la madeleine",
+  "target": "couvreur sd",
   "ll": "50.6568,3.0746",
   "kw": "couvreur la madeleine",
   "city": "La Madeleine",
@@ -50,5 +50,18 @@
   "obj": 5,
   "kg": "/g/11zx_fmqz3",
   "cid": "3500450514530552561"
+ },
+ {
+  "name": "SD toiture Haubourdin couvreur / Professionnel de père en fils",
+  "q": "sd toiture haubourdin couvreur",
+  "target": "sd toiture haubourdin",
+  "ll": "50.6027,2.9956",
+  "kw": "couvreur haubourdin",
+  "city": "Haubourdin",
+  "link": "",
+  "region": "Nord",
+  "obj": 5,
+  "kg": "/g/11zf699ghw",
+  "cid": "11459522363766101297"
  }
 ]
